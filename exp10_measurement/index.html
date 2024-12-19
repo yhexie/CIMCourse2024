@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"
+    />
+    <meta name="description" content="Draw a cylinder or cone.">
+    <meta name="cesium-sandcastle-labels" content="Geometries">
+	<script src="../Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="../Build/Cesium/Widgets/widgets.css">
+    <title>Cesium Demo</title>
+  </head>
+  <body>
+  <style>
+    @import url(../Build/Cesium/Widgets/widgets.css);
+    html,
+    body,
+    .viewerdiv {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+	.toolbar{
+            position: absolute;
+            top:10px;
+            left:20px;
+        }
+  </style>
+  <div id="cesiumContainer" class="viewerdiv"></div>
+  <div id="loadingOverlay"><h1>Loading...</h1></div>
+  <div id="tb1" class="toolbar">
+		<table class="infoPanel">
+			<tbody>
+			  <tr>
+				<td>左键单击绘制点，右击结束线面绘制。</td>
+			  </tr>
+			</tbody>
+		</table>
+		<button class="btnCoord" onclick="axToolCoordinate()">坐标量测</button>
+		<button class="btnDist" onclick="axToolDistance()">距离测量</button>
+		<button class="btnArea" onclick="axToolArea()">面积测量</button>
+		<button class="clearbutton" onclick="removeTools()">清除</button>
+  </div>
+  <script>
+  Cesium.Ion.defaultAccessToken='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkNGNmNzRjYy0xNmZkLTQxNDEtYjQxMy0yMWI4NWE5ZWQwN2IiLCJpZCI6NTM1ODEsImlhdCI6MTYxOTI1NzU5MH0.Xcl8pPPUlgWmdip2hj90xyCoRz_Ikj7zCW1PgJhK2n8';
+	//增加视图区
+	const viewer = new Cesium.Viewer("cesiumContainer", {
+	selectionIndicator: false,
+	baseLayerPicker: true,
+	infoBox: false,
+	terrainProvider: Cesium.createWorldTerrain(),
+	imageryProvider: new Cesium.WebMapTileServiceImageryProvider({
+				url: "http://t0.tianditu.gov.cn/vec_w/wmts?tk=ec5a2a0e05d6e7be9aabdcfa8a8812a9" ,
+				layer: "vec",
+				style: "default",
+				tileMatrixSetID: "w",
+				format: "tiles",
+				maximumLevel: 18,
+			}),
+	});
+	var tileset = new Cesium.Cesium3DTileset({
+      url: "./dayanta/tileset.json",
+      maximumScreenSpaceError : 1});
+	  <!-- const tileset = await Cesium.Cesium3DTileset.fromIonAssetId(40866);-->
+	viewer.scene.primitives.add(tileset);
+    viewer.zoomTo(tileset);
+	var handler=null;
+	var annotations=null;
+	function removeTools()
+	{
+		if(handler!=null && annotations!=null){
+			viewer.entities.removeAll();
+			annotations.removeAll();
+		}
+	}
+  </script>
+  <script src="./axToolCoordinate.js"> </script>
+  <script src="./axToolArea.js"> </script>
+  <script src="./axToolDistance.js"> </script>
+</body>
+</html>

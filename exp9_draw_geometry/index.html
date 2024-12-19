@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"
+    />
+    <meta name="description" content="Draw a cylinder or cone.">
+    <meta name="cesium-sandcastle-labels" content="Geometries">
+	<script src="../Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="../Build/Cesium/Widgets/widgets.css">
+    <title>Cesium Demo</title>
+  </head>
+  <body>
+  <style>
+    @import url(../Build/Cesium/Widgets/widgets.css);
+    html,
+    body,
+    .viewerdiv {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+	.toolbar{
+            position: absolute;
+            top:10px;
+            left:20px;
+        }
+  </style>
+  <div id="cesiumContainer" class="viewerdiv"></div>
+  <div id="loadingOverlay"><h1>Loading...</h1></div>
+  <div id="tb1" class="toolbar">
+		<table class="infoPanel">
+			<tbody>
+			  <tr>
+				<td>左键单击绘制点，右击结束线面绘制。</td>
+			  </tr>
+			</tbody>
+		</table>
+		<select id="drawtype" multiple=multiple size="6" onchange="DrawPoint()">
+			<optgroup label="绘制图形"  ></optgroup>
+				<option value="point">添加点</option>
+				<option value="line">添加线</option>
+				<option value="polygon">添加面</option>
+		</select>
+		<button class="clearbutton" onclick="removePrimitives()">清除</button>
+  </div>
+  <script src="./code.js"> </script>
+</body>
+</html>

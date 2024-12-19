@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"
+    />
+    <meta name="description" content="Draw a cylinder or cone.">
+    <meta name="cesium-sandcastle-labels" content="Geometries">
+	<script src="../Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="../Build/Cesium/Widgets/widgets.css">
+    <title>Cesium坐标系和坐标变换</title>
+  </head>
+  <body>
+  <style>
+    @import url(../Build/Cesium/Widgets/widgets.css);
+    html,
+    body,
+    .viewerdiv {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+	.toolbar{
+            position: absolute;
+            top:10px;
+            left:20px;
+        }
+  </style>
+  <div id="cesiumContainer" class="viewerdiv"></div>
+  <div id="loadingOverlay"><h1>Loading...</h1></div>
+  <div id="tb1" class="toolbar">
+		<table class="infoPanel">
+			<tbody>
+			  <tr>
+				<td>左键单击,拾取坐标</td>
+			  </tr>
+			</tbody>
+		</table>
+		<button value="point" onclick="computeViewRect()">计算显示范围</button>
+  </div>
+  <script> 
+	Cesium.Ion.defaultAccessToken='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkNGNmNzRjYy0xNmZkLTQxNDEtYjQxMy0yMWI4NWE5ZWQwN2IiLCJpZCI6NTM1ODEsImlhdCI6MTYxOTI1NzU5MH0.Xcl8pPPUlgWmdip2hj90xyCoRz_Ikj7zCW1PgJhK2n8';
+	//增加视图区
+	const viewer = new Cesium.Viewer("cesiumContainer", {
+	selectionIndicator: false,
+	baseLayerPicker: true,
+	infoBox: false,
+	terrainProvider: Cesium.createWorldTerrain(),
+	imageryProvider: new Cesium.WebMapTileServiceImageryProvider({
+				url: "http://t0.tianditu.gov.cn/vec_w/wmts?tk=ec5a2a0e05d6e7be9aabdcfa8a8812a9" ,
+				layer: "vec",
+				style: "default",
+				tileMatrixSetID: "w",
+				format: "tiles",
+				maximumLevel: 18,
+			}),
+	});
+	var tileset = new Cesium.Cesium3DTileset({
+      url: "./dayanta/tileset.json",
+      maximumScreenSpaceError : 1});
+	  <!-- const tileset = await Cesium.Cesium3DTileset.fromIonAssetId(40866);-->
+	viewer.scene.primitives.add(tileset);
+    viewer.zoomTo(tileset);
+	const handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
+	handler.setInputAction(function (event) {
+		const ray = viewer.camera.getPickRay(event.position);//根据鼠标点击坐标和相机坐标构建射线
+		const earthPosition = viewer.scene.globe.pick(ray, viewer.scene);//射线与球面求交，在地表的交点
+		const intersectPt = viewer.scene.pickPosition(event.position);//获取与倾斜摄影模型或其他模型的交点
+		const intersectEllipsoidPt = viewer.scene.camera.pickEllipsoid(event.position);//
+		// `earthPosition` will be undefined if our mouse is not over the globe.
+		if (Cesium.defined(earthPosition)) //鼠标点击在地球范围内
+		{
+			var msg="屏幕坐标："+event.position.x+","+event.position.y+"\n";
+			msg+="pick空间直角坐标系："+earthPosition.x+","+earthPosition.y+","+earthPosition.z+"\n";
+			msg+="pickPosition空间直角坐标系："+intersectPt.x+","+intersectPt.y+","+intersectPt.z+"\n";
+			msg+="pickEllipsoid空间直角坐标系："+intersectEllipsoidPt.x+","+intersectEllipsoidPt.y+","+intersectEllipsoidPt.z;
+			alert(msg);
+		}
+	}, Cesium.ScreenSpaceEventType.LEFT_CLICK);//鼠标左键
+	viewer.cesiumWidget.screenSpaceEventHandler.removeInputAction(
+		Cesium.ScreenSpaceEventType.LEFT_DOUBLE_CLICK
+	);
+	
+	function computeViewRect(){
+		 let rec = viewer.camera.computeViewRectangle();
+		 if (!rec) {
+			 console.log("rec is undefined");
+			 return;
+		 }
+		 let extent = [Cesium.Math.toDegrees(rec.west),
+						 Cesium.Math.toDegrees(rec.south),
+						 Cesium.Math.toDegrees(rec.east),
+						 Cesium.Math.toDegrees(rec.north),
+			]
+		var msg="显示范围：东"+extent[0]+",南"+extent[1]+",西"+extent[2]+",北"+extent[3]+"\n";
+				
+		alert(msg);
+	}
+  </script>
+</body>
+</html>

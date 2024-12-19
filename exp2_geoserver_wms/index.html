@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Use correct character set. -->
+    <meta charset="utf-8" />
+    <!-- Tell IE to use the latest, best version. -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <!-- Make the application on mobile take up the full browser screen and disable user scaling. -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"
+    />
+    <title>Hello World!</title>
+    <script src="../Build/CesiumUnminified/Cesium.js"></script>
+    <style>
+      @import url(../Build/CesiumUnminified/Widgets/widgets.css);
+      html,
+      body,
+      #cesiumContainer {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="cesiumContainer"></div>
+    <script>
+	  Cesium.Ion.defaultAccessToken='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkNGNmNzRjYy0xNmZkLTQxNDEtYjQxMy0yMWI4NWE5ZWQwN2IiLCJpZCI6NTM1ODEsImlhdCI6MTYxOTI1NzU5MH0.Xcl8pPPUlgWmdip2hj90xyCoRz_Ikj7zCW1PgJhK2n8';
+    var viewer = new Cesium.Viewer('cesiumContainer', {
+	    timeline:false,
+    	animation:false,
+    	vrButton:true,
+    	sceneModePicker:false,
+    	infoBox:true,
+    	scene3DOnly:true,
+    	terrainProvider: Cesium.createWorldTerrain()
+      });
+	  viewer._cesiumWidget._creditContainer.style.display = "none"; 
+  	var imageryProvider = new Cesium.WebMapServiceImageryProvider({
+    url : 'http://127.0.0.1:8180/geoserver/CJZTown/wms?',
+    layers : 'CJZTown:cjzALL', // WMS图层名称
+    parameters : {
+        transparent : true, // 设置为透明背景
+        format: "image/png",
+        srs: "EPSG:4326",
+       }
+    });
+ 
+    // 创建一个ImageryLayer实例，将ImageryProvider添加到场景中
+    var imageryLayer = new Cesium.ImageryLayer(imageryProvider);
+    viewer.imageryLayers.add(imageryLayer);
+    viewer.homeButton.viewModel.command.beforeExecute.addEventListener(function(commandInfo) {
+	    // Fly to tileset
+    	viewer.flyTo(imageryLayer);
+
+	    // Tell the home button not to do anything
+	    commandInfo.cancel = true;
+    });
+    </script>
+  </body>
+</html>
