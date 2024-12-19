@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="../Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="../Build/Cesium/Widgets/widgets.css">
+    <style>
+        html,
+        body,
+        .viewerdiv{
+            width: 100%;
+            height: 100%;
+            margin:0;
+            padding: 0;
+        }
+        .toolbar{
+            position: absolute;
+            top:10px;
+            left:20px;
+            background-color: rgb(0,0,0,0);
+        }
+    </style>
+</head>
+<body>
+    <!-- 创建div,承载整个Cesium场景、添加工具栏 -->
+    <div id="cesiumContainer",class="viewerdiv">
+    </div>
+    <div id="tb1" class="toolbar">
+		<button class="default" onclick="Defaultstyling()">默认样式</button>
+		<button class="basic" onclick="Basicstyling()">基础样式</button>
+        <button class="custom" onclick="Customstyling()">自定义样式</button>
+  </div>
+
+    <script>
+        Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkNGNmNzRjYy0xNmZkLTQxNDEtYjQxMy0yMWI4NWE5ZWQwN2IiLCJpZCI6NTM1ODEsImlhdCI6MTYxOTI1NzU5MH0.Xcl8pPPUlgWmdip2hj90xyCoRz_Ikj7zCW1PgJhK2n8';
+	
+	const viewer = new Cesium.Viewer("cesiumContainer", {
+        timeline:false,//是否显示时间轴工具
+    	animation:false,//是否显示动画工具
+		fullscreenButton:false, //是否显示全屏按钮工具
+    	infoBox:false,
+    	imageryProvider: new Cesium.WebMapTileServiceImageryProvider({
+	    	url: "http://t0.tianditu.gov.cn/vec_w/wmts?tk=ec5a2a0e05d6e7be9aabdcfa8a8812a9" ,
+	    	layer: "vec",
+	    	style: "default",
+	    	tileMatrixSetID: "w",
+	    	format: "tiles",
+	    	maximumLevel: 18,
+	    }),
+    });
+	reset();
+
+    // 封装函数
+    function Defaultstyling(){
+		reset();
+		viewer.dataSources.add(
+		Cesium.GeoJsonDataSource.load(
+		  "./10.json"
+		)
+	  );
+	}
+     // 封装函数
+    function Basicstyling(){
+		reset();
+		viewer.dataSources.add(
+		Cesium.GeoJsonDataSource.load(
+		  "./10.json",
+		  {
+			stroke: Cesium.Color.HOTPINK,
+			fill: Cesium.Color.PINK.withAlpha(0.5),
+			strokeWidth: 3,
+		  })
+		);
+	}
+	function Customstyling(){
+		reset();
+		Cesium.Math.setRandomNumberSeed(0);
+
+		const promise = Cesium.GeoJsonDataSource.load(
+			"./ne_10m_us_states.topojson"
+		);
+		promise.then(function (dataSource) {
+		  viewer.dataSources.add(dataSource);
+
+		  //Get the array of entities
+		  const entities = dataSource.entities.values;
+
+		  const colorHash = {};
+		  for (let i = 0; i < entities.length; i++) {
+			//For each entity, create a random color based on the state name.
+			//Some states have multiple entities, so we store the color in a
+			//hash so that we use the same color for the entire state.
+			const entity = entities[i];
+			const name = entity.name;
+			let color = colorHash[name];
+			if (!color) {
+			  color = Cesium.Color.fromRandom({
+				alpha: 1.0,
+			  });
+			  colorHash[name] = color;
+			}
+
+			//Set the polygon material to our random color.
+			entity.polygon.material = color;
+			//Remove the outlines.
+			entity.polygon.outline = false;
+
+			//Extrude the polygon based on the state's population.  Each entity
+			//stores the properties for the GeoJSON feature it was created from
+			//Since the population is a huge number, we divide by 50.
+			entity.polygon.extrudedHeight =
+			  entity.properties.Population / 50.0;
+		  }
+		})
+		.catch(function (error) {
+		  //Display any errrors encountered while loading.
+		  window.alert(error);
+		});
+	}
+	
+	function reset() {
+	  viewer.dataSources.removeAll();
+
+	  //Set the camera to a US centered tilted view and switch back to moving in world coordinates.
+	  viewer.camera.lookAt(
+		Cesium.Cartesian3.fromDegrees(-98.0, 40.0),
+		new Cesium.Cartesian3(0.0, -4790000.0, 3930000.0)
+	  );
+	  viewer.camera.lookAtTransform(Cesium.Matrix4.IDENTITY);
+	};
+	reset();
+    </script>
+</body>
+</html>

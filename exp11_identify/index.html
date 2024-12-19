@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"
+    />
+    <meta name="description" content="Draw a cylinder or cone.">
+    <meta name="cesium-sandcastle-labels" content="Geometries">
+	<script src="../Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="../Build/Cesium/Widgets/widgets.css">
+    <title>WFS属性查询</title>
+    <script src="js/jquery.min.js"></script>
+  </head>
+  <body>
+  <style>
+    @import url(../Build/Cesium/Widgets/widgets.css);
+    html,
+    body,
+    .viewerdiv {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+	.toolbar{
+            position: absolute;
+            top:10px;
+            left:20px;
+        }
+	.propertys{
+		position:absolute;
+		top:80px;
+		left:10px;
+		z-index:999;
+		background-color: rgba(60, 60, 60, 0.5);
+		width:200px;
+		height:100px;
+		font-size:13px;
+		display:none;
+		line-height:25px;
+	}
+  </style>
+  <div id="cesiumContainer" class="viewerdiv"></div>
+  <div id="loadingOverlay"><h1>Loading...</h1></div>
+  <div id="tb1" class="toolbar">
+		<table class="infoPanel">
+			<tbody>
+			  <tr>
+				<td>左键单击绘制点，右击结束线面绘制。</td>
+			  </tr>
+			</tbody>
+		</table>
+		<button class="btnSelect" onclick="axToolSelection()">选择</button>
+		<button class="btnIdentity" onclick="axToolIdentify()">查询属性</button>
+  </div>
+  <div id="infowindow" class="propertys">
+  </div>
+  <script src="./code.js"> </script>
+  <script src="./axToolSelection.js"> </script>
+  <script src="./axToolIdentify.js"> </script>
+</body>
+</html>
